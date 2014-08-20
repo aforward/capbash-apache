@@ -1,0 +1,8 @@
+#!/bin/bash
+./submodules/docker/install
+./submodules/apache/install
+
+cp ./submodules/apache/files/helloworld_apache_conf /etc/apache/sites-enabled/helloworld
+mkdir -p /var/apps/helloworld
+echo "HELLO WORLD" > /var/apps/helloworld/index.html
+echo "<?php phpinfo(); ?>" > /var/apps/helloworld/index.php

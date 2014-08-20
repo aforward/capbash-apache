@@ -1,0 +1,3 @@
+#!/bin/bash
+ID=$(docker ps --no-trunc -q)
+lxc-attach -n $ID

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+#-----------
+# Configurations
+#-----------
+
+APACHE_SITES_ENABLED_DIR=${APACHE_SITES_ENABLED_DIR-/etc/apache/sites-enabled}
+APACHE_SITES_AVAILABLE_DIR=${APACHE_SITES_AVAILABLE_DIR-/etc/apache/sites-available}
+APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache}
+APACHE_HTTP_PORT=${APACHE_HTTP_PORT-80}
+APACHE_SSL_PORT=${APACHE_SSL_PORT-443}
+APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/apps}
+
+APACHE_INCLUDE_PHP=${APACHE_INCLUDE_PHP-true}
+APACHE_INCLUDE_MYSQL=${APACHE_INCLUDE_MYSQL-true}
+
+DOCKER_SUPPORT_LXC=${DOCKER_SUPPORT_LXC-false}
+
+#-----------
+# Install Script
+#-----------
+
+mkdir -p /var/apps/apache
+mkdir -p /var/apps/apache/startup.d
+mkdir -p $APACHE_SITES_ENABLED_DIR $APACHE_SITES_AVAILABLE_DIR
+
+chown -R www-data:www-data $APACHE_SITES_ENABLED_DIR
+chown -R www-data:www-data $APACHE_SITES_AVAILABLE_DIR
+cp ./submodules/apache/files/apache.dockerfile /var/apps/apache/Dockerfile
+
+if [[ "$APACHE_INCLUDE_PHP" = true ]]; then
+  sed -i 's|# @PHP_INSTALL@|cat ./submodules/apache/files/php_partial.dockerfile|e' /var/apps/apache/Dockerfile
+  printf '#!/bin/bash\n/etc/init.d/php5-fpm restart\n' > /var/apps/apache/startup.d/php5_fpm
+  chmod 755 /var/apps/apache/startup.d/php5_fpm
+else
+  printf '#!/bin/bash\n# Do nothing\n' > /var/apps/apache/startup.d/empty
+  chmod 755 /var/apps/apache/startup.d/empty
+  rm -f /var/apps/apache/startup.d/php5_fpm
+fi
+
+if [[ "$APACHE_INCLUDE_MYSQL" = true ]]; then
+  sed -i 's|# @MYSQL_INSTALL@|cat ./submodules/apache/files/mysql_partial.dockerfile|e' /var/apps/apache/Dockerfile
+fi
+
+(cd /var/apps/apache && docker build -t apache .)
+
+if [[ "$DOCKER_SUPPORT_LXC" == true ]]; then
+  cp ./submodules/apache/files/console /var/apps/apache/console
+  chmod 755 /var/apps/apache/console
+fi
+
+echo "docker run -i -t -p $APACHE_HTTP_PORT:80 -p $APACHE_SSL_PORT:443 -v $APACHE_APPS_DIR:/var/apps -v $APACHE_SITES_ENABLED_DIR:/etc/apache/sites-enabled -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache/sites-available -v $APACHE_LOG_DIR:/var/log/apache apache /bin/bash" > /var/apps/apache/debug
+printf "#!/bin/bash\ndocker rm apache > /dev/num\ndocker run -d -t -p $APACHE_HTTP_PORT:80 -p $APACHE_SSL_PORT:443 -v $APACHE_APPS_DIR:/var/apps -v $APACHE_SITES_ENABLED_DIR:/etc/apache/sites-enabled -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache/sites-available -v $APACHE_LOG_DIR:/var/log/apache --name apache apache" > /var/apps/apache/start
+echo 'docker stop $(docker ps | grep apache | awk '{print $1}')' > /var/apps/apache/stop
+
+cp ./submodules/apache/files/idempot /var/apps/apache/idempot
+
+chmod 755 /var/apps/apache/start
+chmod 755 /var/apps/apache/idempot
+chmod 755 /var/apps/apache/debug
+chmod 755 /var/apps/apache/stop
