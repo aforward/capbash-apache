@@ -1,29 +1,29 @@
-# Nginx Dockerfile
-# https://github.com/dockerfile/apache
 FROM ubuntu:14.04
 
-ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get -y upgrade
 
-RUN apt-get update && \
-    apt-get -yq install \
-        curl \
-        apache2 \
-    rm -rf /var/lib/apt/lists/*
-RUN sed -i "s/variables_order.*/variables_order = \"EGPCS\"/g" /etc/php5/apache2/php.ini
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN apt-get install -y inotify-tools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 curl lynx-cur inotify-tools
 
 # @PHP_INSTALL@
 # @MYSQL_INSTALL@
 
+RUN a2enmod rewrite
+
+# Manually set up the apache environment variables
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+ENV APACHE_PID_FILE /var/run/apache2.pid
+
 # Define mountable directories.
-VOLUME ["/data", "/etc/apache/sites-enabled", "/etc/apache/sites-available", "/var/log/apache"]
+VOLUME ["/data", "/etc/apache2/sites-enabled", "/etc/apache2/sites-available", "/var/log/apache2"]
 
 # Define working directory.
-WORKDIR /etc/apache
+WORKDIR /etc/apache2
 
-CMD run-parts /var/apps/apache/startup.d && source /etc/apache2/envvars && exec apache2 -D FOREGROUND
+CMD run-parts /var/apps/apache/startup.d && exec apache2 -D FOREGROUND
 
 # Expose ports.
 EXPOSE 80

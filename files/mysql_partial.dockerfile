@@ -1,3 +1,2 @@
 # Install MYSQL
-RUN apt-get -yq install \
-        php5-mysql
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install libapache2-mod-php5 php5-mysql

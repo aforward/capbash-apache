@@ -25,9 +25,9 @@ capbash install apache
 The available configurations include:
 
 ```
-APACHE_SITES_ENABLED_DIR=${APACHE_SITES_ENABLED_DIR-/etc/apache/sites-enabled}
-APACHE_SITES_AVAILABLE_DIR=${APACHE_SITES_AVAILABLE_DIR-/etc/apache/sites-available}
-APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache}
+APACHE_SITES_ENABLED_DIR=${APACHE_SITES_ENABLED_DIR-/etc/apache2/sites-enabled}
+APACHE_SITES_AVAILABLE_DIR=${APACHE_SITES_AVAILABLE_DIR-/etc/apache2/sites-available}
+APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache2}
 APACHE_HTTP_PORT=${APACHE_HTTP_PORT-80}
 APACHE_SSL_PORT=${APACHE_SSL_PORT-443}
 APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/apps}
@@ -40,7 +40,7 @@ applications deployed to $APACHE_APPS_DIR.
 For example
 
 ```
-vi /etc/apache/sites-enabled/default
+vi /etc/apache2/sites-enabled/default
 server {
   listen       80;
   server_name  0.0.0.0;

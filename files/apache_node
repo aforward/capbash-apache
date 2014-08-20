@@ -2,7 +2,10 @@
 ./submodules/docker/install
 ./submodules/apache/install
 
-cp ./submodules/apache/files/helloworld_apache_conf /etc/apache/sites-enabled/helloworld
+cp ./submodules/apache/files/helloworld_apache_conf /etc/apache2/sites-enabled/helloworld.conf
+chown www-data:www-data /etc/apache2/sites-enabled/helloworld.conf
 mkdir -p /var/apps/helloworld
 echo "HELLO WORLD" > /var/apps/helloworld/index.html
 echo "<?php phpinfo(); ?>" > /var/apps/helloworld/index.php
+
+/var/apps/apache/idempot
