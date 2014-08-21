@@ -1,9 +1,9 @@
 FROM ubuntu:14.04
 
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get -qq update
+RUN apt-get -qqy upgrade
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 curl lynx-cur inotify-tools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qqy install apache2 curl lynx-cur inotify-tools
 
 # @PHP_INSTALL@
 # @MYSQL_INSTALL@

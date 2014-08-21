@@ -73,28 +73,8 @@ docker run -d -t \\
   --name apache \\
   apache" > /var/apps/apache/start
 
-printf "%b" "#!/bin/bash
-CONTAINER_ID=\$(docker ps | grep apache | awk '{print \$1}')
-if [[ \"\$CONTAINER_ID\" == '' ]]; then
-  echo 'APACHE container already stopped, nothing to do.'
-else
-  echo 'Stopping APACHE...'
-  docker stop \$CONTAINER_ID
-  echo 'DONE Stopping APACHE.'
-fi
-" > /var/apps/apache/stop
-
-printf "%b" "#!/bin/bash
-RUNNING=\`docker ps | grep apache\`
-if [[ \"\$RUNNING\" == '' ]]; then
-  echo 'Starting APACHE container...'
-  /var/apps/apache/start
-else
-  echo 'APACHE container already running'
-fi
-" > /var/apps/apache/idempot
+NAME=apache DIR=/var/apps/apache ./submodules/docker/stop
+NAME=apache DIR=/var/apps/apache ./submodules/docker/idempot
 
 chmod 755 /var/apps/apache/start
-chmod 755 /var/apps/apache/idempot
 chmod 755 /var/apps/apache/debug
-chmod 755 /var/apps/apache/stop
