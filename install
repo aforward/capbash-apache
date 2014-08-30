@@ -90,3 +90,5 @@ NAME=apache DIR=$APACHE_LAUNCHER_DIR ./submodules/docker/idempot
 
 chmod 755 $APACHE_LAUNCHER_DIR/start
 chmod 755 $APACHE_LAUNCHER_DIR/debug
+
+echo "DONE, Install apache."
