@@ -24,16 +24,19 @@ DOCKER_SUPPORT_LXC=${DOCKER_SUPPORT_LXC-false}
 
 echo "Install apache..."
 
-mkdir -p ${APACHE_LAUNCHER_DIR}
-mkdir -p ${APACHE_LAUNCHER_DIR}/startup.d
+mkdir -p $APACHE_LAUNCHER_DIR/files
+mkdir -p $APACHE_LAUNCHER_DIR/startup.d
 mkdir -p $APACHE_SITES_ENABLED_DIR $APACHE_SITES_AVAILABLE_DIR
 
 chown -R www-data:www-data $APACHE_SITES_ENABLED_DIR
 chown -R www-data:www-data $APACHE_SITES_AVAILABLE_DIR
+
 cp ./submodules/apache/files/apache.dockerfile ${APACHE_LAUNCHER_DIR}/Dockerfile
 
-printf '#!/bin/bash\n# Do nothing\n' > ${APACHE_LAUNCHER_DIR}/startup.d/empty
-chmod 755 ${APACHE_LAUNCHER_DIR}/startup.d/empty
+if [[ ! -e $APACHE_LAUNCHER_DIR/files/do_nothing ]]; then
+  printf '#!/bin/bash\n# Do nothing\n' > $APACHE_LAUNCHER_DIR/files/do_nothing
+  chmod 755 $APACHE_LAUNCHER_DIR/files/do_nothing
+fi
 
 if [[ "$APACHE_INCLUDE_PHP" = true ]]; then
   echo "  -- enabling php"
@@ -46,13 +49,13 @@ if [[ "$APACHE_INCLUDE_MYSQL" = true ]]; then
 fi
 
 if [[ "$APACHE_INCLUDE_RELOAD" = true ]]; then
-  cp ./submodules/apache/files/apache_touch $APACHE_LAUNCHER_DIR/files/nginx_touch
+  cp ./submodules/apache/files/apache_touch $APACHE_LAUNCHER_DIR/files/apache_touch
   cp ./submodules/apache/files/touchandgo $APACHE_LAUNCHER_DIR/files/touchandgo
-  cp ./submodules/apache/files/apache_reload $APACHE_LAUNCHER_DIR/files/nginx_reload
-  sed -i 's|# @RELOAD_INSTALL@|cat ./submodules/nginx/files/reload_partial.dockerfile|e' $APACHE_LAUNCHER_DIR/Dockerfile
+  cp ./submodules/apache/files/apache_reload $APACHE_LAUNCHER_DIR/files/apache_reload
+  sed -i 's|# @RELOAD_INSTALL@|cat ./submodules/apache/files/reload_partial.dockerfile|e' $APACHE_LAUNCHER_DIR/Dockerfile
 fi
 
-(cd ${APACHE_LAUNCHER_DIR} && docker build -t apache .)
+(cd $APACHE_LAUNCHER_DIR && docker build -t apache .)
 
 if [[ "$DOCKER_SUPPORT_LXC" == true ]]; then
   echo "  -- enabling LXC support"
@@ -64,7 +67,7 @@ printf "%b" "#!/bin/bash
 docker run -i -t \\
   -p 9999:80 \\
   -p 9998:443 \\
-  -v $APACHE_APPS_DIR:/var/local/apps \\
+  -v $APACHE_APPS_DIR:/data \\
   -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\
@@ -75,15 +78,15 @@ docker rm apache > /dev/num
 docker run -d -t \\
   -p $APACHE_HTTP_PORT:80 \\
   -p $APACHE_SSL_PORT:443 \\
-  -v $APACHE_APPS_DIR:/var/local/apps \\
+  -v $APACHE_APPS_DIR:/data \\
   -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\
   --name apache \\
-  apache" > ${APACHE_LAUNCHER_DIR}/start
+  apache" > $APACHE_LAUNCHER_DIR/start
 
 NAME=apache DIR=$APACHE_LAUNCHER_DIR ./submodules/docker/stop
 NAME=apache DIR=$APACHE_LAUNCHER_DIR ./submodules/docker/idempot
 
-chmod 755 ${APACHE_LAUNCHER_DIR}/start
-chmod 755 ${APACHE_LAUNCHER_DIR}/debug
+chmod 755 $APACHE_LAUNCHER_DIR/start
+chmod 755 $APACHE_LAUNCHER_DIR/debug
