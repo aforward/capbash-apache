@@ -1,9 +1,9 @@
 <VirtualHost *:80>
   ServerAdmin me@mydomain.com
 
-  DocumentRoot /var/local/apps/helloworld
+  DocumentRoot /data/helloworld
 
-  <Directory /var/local/apps/helloworld>
+  <Directory /data/helloworld>
       Options Indexes FollowSymLinks MultiViews
       AllowOverride All
       Require all granted
