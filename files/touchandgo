@@ -1,0 +1,16 @@
+#!/bin/bash
+FILE_TO_WATCH=$1
+COMMAND_TO_RUN=$2
+
+while :
+do
+  if [[ ! -e $FILE_TO_WATCH ]]; then
+    echo "No file to watch ($FILE_TO_WATCH)"
+    exit 1
+  fi
+
+  EVENT=$(inotifywait --format '%e' $FILE_TO_WATCH)
+  [ "$EVENT" = "DELETE_SELF" ] && exit 1
+  echo "TOUCH AND GO CALL: $COMMAND_TO_RUN"
+  $COMMAND_TO_RUN
+done

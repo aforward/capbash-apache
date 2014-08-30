@@ -3,7 +3,7 @@
 RUNNING=`docker ps | grep apache`
 if [[ "$RUNNING" == "" ]]; then
   echo "Starting APACHE container..."
-  /var/apps/apache/start
+  /var/local/apache/start
 else
   echo "APACHE container already running"
 fi

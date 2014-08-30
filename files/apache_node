@@ -8,4 +8,4 @@ mkdir -p /var/apps/helloworld
 echo "HELLO WORLD" > /var/apps/helloworld/index.html
 echo "<?php phpinfo(); ?>" > /var/apps/helloworld/index.php
 
-/var/apps/apache/idempot
+/var/local/apache/idempot

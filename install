@@ -10,6 +10,8 @@ APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache2}
 APACHE_HTTP_PORT=${APACHE_HTTP_PORT-80}
 APACHE_SSL_PORT=${APACHE_SSL_PORT-443}
 APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/apps}
+APACHE_INCLUDE_RELOAD=${APACHE_INCLUDE_RELOAD-true}
+APACHE_LAUNCHER_DIR=${APACHE_LAUNCHER_DIR-/var/local/apache}
 
 APACHE_INCLUDE_PHP=${APACHE_INCLUDE_PHP-true}
 APACHE_INCLUDE_MYSQL=${APACHE_INCLUDE_MYSQL-true}
@@ -22,33 +24,40 @@ DOCKER_SUPPORT_LXC=${DOCKER_SUPPORT_LXC-false}
 
 echo "Install apache..."
 
-mkdir -p /var/apps/apache
-mkdir -p /var/apps/apache/startup.d
+mkdir -p ${APACHE_LAUNCHER_DIR}
+mkdir -p ${APACHE_LAUNCHER_DIR}/startup.d
 mkdir -p $APACHE_SITES_ENABLED_DIR $APACHE_SITES_AVAILABLE_DIR
 
 chown -R www-data:www-data $APACHE_SITES_ENABLED_DIR
 chown -R www-data:www-data $APACHE_SITES_AVAILABLE_DIR
-cp ./submodules/apache/files/apache.dockerfile /var/apps/apache/Dockerfile
+cp ./submodules/apache/files/apache.dockerfile ${APACHE_LAUNCHER_DIR}/Dockerfile
 
-printf '#!/bin/bash\n# Do nothing\n' > /var/apps/apache/startup.d/empty
-chmod 755 /var/apps/apache/startup.d/empty
+printf '#!/bin/bash\n# Do nothing\n' > ${APACHE_LAUNCHER_DIR}/startup.d/empty
+chmod 755 ${APACHE_LAUNCHER_DIR}/startup.d/empty
 
 if [[ "$APACHE_INCLUDE_PHP" = true ]]; then
   echo "  -- enabling php"
-  sed -i 's|# @PHP_INSTALL@|cat ./submodules/apache/files/php_partial.dockerfile|e' /var/apps/apache/Dockerfile
+  sed -i 's|# @PHP_INSTALL@|cat ./submodules/apache/files/php_partial.dockerfile|e' ${APACHE_LAUNCHER_DIR}/Dockerfile
 fi
 
 if [[ "$APACHE_INCLUDE_MYSQL" = true ]]; then
   echo "  -- enabling mysql"
-  sed -i 's|# @MYSQL_INSTALL@|cat ./submodules/apache/files/mysql_partial.dockerfile|e' /var/apps/apache/Dockerfile
+  sed -i 's|# @MYSQL_INSTALL@|cat ./submodules/apache/files/mysql_partial.dockerfile|e' ${APACHE_LAUNCHER_DIR}/Dockerfile
 fi
 
-(cd /var/apps/apache && docker build -t apache .)
+if [[ "$APACHE_INCLUDE_RELOAD" = true ]]; then
+  cp ./submodules/apache/files/apache_touch $APACHE_LAUNCHER_DIR/files/nginx_touch
+  cp ./submodules/apache/files/touchandgo $APACHE_LAUNCHER_DIR/files/touchandgo
+  cp ./submodules/apache/files/apache_reload $APACHE_LAUNCHER_DIR/files/nginx_reload
+  sed -i 's|# @RELOAD_INSTALL@|cat ./submodules/nginx/files/reload_partial.dockerfile|e' $APACHE_LAUNCHER_DIR/Dockerfile
+fi
+
+(cd ${APACHE_LAUNCHER_DIR} && docker build -t apache .)
 
 if [[ "$DOCKER_SUPPORT_LXC" == true ]]; then
   echo "  -- enabling LXC support"
-  cp ./submodules/apache/files/console /var/apps/apache/console
-  chmod 755 /var/apps/apache/console
+  cp ./submodules/apache/files/console ${APACHE_LAUNCHER_DIR}/console
+  chmod 755 ${APACHE_LAUNCHER_DIR}/console
 fi
 
 printf "%b" "#!/bin/bash
@@ -59,7 +68,7 @@ docker run -i -t \\
   -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\
-  apache /bin/bash" > /var/apps/apache/debug
+  apache /bin/bash" > ${APACHE_LAUNCHER_DIR}/debug
 
 printf "%b" "#!/bin/bash
 docker rm apache > /dev/num
@@ -71,10 +80,10 @@ docker run -d -t \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\
   --name apache \\
-  apache" > /var/apps/apache/start
+  apache" > ${APACHE_LAUNCHER_DIR}/start
 
-NAME=apache DIR=/var/apps/apache ./submodules/docker/stop
-NAME=apache DIR=/var/apps/apache ./submodules/docker/idempot
+NAME=apache DIR=$APACHE_LAUNCHER_DIR ./submodules/docker/stop
+NAME=apache DIR=$APACHE_LAUNCHER_DIR ./submodules/docker/idempot
 
-chmod 755 /var/apps/apache/start
-chmod 755 /var/apps/apache/debug
+chmod 755 ${APACHE_LAUNCHER_DIR}/start
+chmod 755 ${APACHE_LAUNCHER_DIR}/debug

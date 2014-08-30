@@ -60,7 +60,7 @@ echo "HELLO WORLD" > /var/apps/example/index.html
 Now, when you start the daemon,
 
 ```
-/var/apps/apache/daemon
+/var/local/apache/daemon
 ```
 
 You should be able to see the sample page (replace the IP address) at

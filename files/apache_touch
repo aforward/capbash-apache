@@ -1,0 +1,4 @@
+#!/bin/bash
+touch /data/apache_reload
+chmod 777 /data/apache_reload
+/usr/local/bin/touchandgo /data/apache_reload /usr/local/bin/apache_reload &
