@@ -5,8 +5,15 @@ RUN apt-get -qqy upgrade
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qqy install apache2 curl lynx-cur inotify-tools
 
+RUN mkdir -p /etc/apache2/startup.d
+
+ADD files/do_nothing /etc/apache2/startup.d/do_nothing
+
 # @PHP_INSTALL@
 # @MYSQL_INSTALL@
+# @RELOAD_INSTALL@
+
+RUN chmod 755 -R /etc/apache2/startup.d
 
 RUN a2enmod rewrite
 
@@ -23,7 +30,7 @@ VOLUME ["/data", "/etc/apache2/sites-enabled", "/etc/apache2/sites-available", "
 # Define working directory.
 WORKDIR /etc/apache2
 
-CMD run-parts /var/local/apache/startup.d && exec apache2 -D FOREGROUND
+CMD run-parts /etc/apache2/startup.d && exec apache2 -D FOREGROUND
 
 # Expose ports.
 EXPOSE 80
