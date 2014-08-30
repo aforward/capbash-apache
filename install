@@ -9,7 +9,7 @@ APACHE_SITES_AVAILABLE_DIR=${APACHE_SITES_AVAILABLE_DIR-/etc/apache2/sites-avail
 APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache2}
 APACHE_HTTP_PORT=${APACHE_HTTP_PORT-80}
 APACHE_SSL_PORT=${APACHE_SSL_PORT-443}
-APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/apps}
+APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/local/apps}
 APACHE_INCLUDE_RELOAD=${APACHE_INCLUDE_RELOAD-true}
 APACHE_LAUNCHER_DIR=${APACHE_LAUNCHER_DIR-/var/local/apache}
 
@@ -64,7 +64,7 @@ printf "%b" "#!/bin/bash
 docker run -i -t \\
   -p 9999:80 \\
   -p 9998:443 \\
-  -v $APACHE_APPS_DIR:/var/apps \\
+  -v $APACHE_APPS_DIR:/var/local/apps \\
   -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\
@@ -75,7 +75,7 @@ docker rm apache > /dev/num
 docker run -d -t \\
   -p $APACHE_HTTP_PORT:80 \\
   -p $APACHE_SSL_PORT:443 \\
-  -v $APACHE_APPS_DIR:/var/apps \\
+  -v $APACHE_APPS_DIR:/var/local/apps \\
   -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled \\
   -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available \\
   -v $APACHE_LOG_DIR:/var/log/apache2 \\

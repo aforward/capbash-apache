@@ -4,8 +4,8 @@
 
 cp ./submodules/apache/files/helloworld_apache_conf /etc/apache2/sites-enabled/helloworld.conf
 chown www-data:www-data /etc/apache2/sites-enabled/helloworld.conf
-mkdir -p /var/apps/helloworld
-echo "HELLO WORLD" > /var/apps/helloworld/index.html
-echo "<?php phpinfo(); ?>" > /var/apps/helloworld/index.php
+mkdir -p /var/local/apps/helloworld
+echo "HELLO WORLD" > /var/local/apps/helloworld/index.html
+echo "<?php phpinfo(); ?>" > /var/local/apps/helloworld/index.php
 
 /var/local/apache/idempot

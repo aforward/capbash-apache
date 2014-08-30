@@ -30,7 +30,7 @@ APACHE_SITES_AVAILABLE_DIR=${APACHE_SITES_AVAILABLE_DIR-/etc/apache2/sites-avail
 APACHE_LOG_DIR=${APACHE_LOG_DIR-/var/log/apache2}
 APACHE_HTTP_PORT=${APACHE_HTTP_PORT-80}
 APACHE_SSL_PORT=${APACHE_SSL_PORT-443}
-APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/apps}
+APACHE_APPS_DIR=${APACHE_APPS_DIR-/var/local/apps}
 APACHE_INCLUDE_PHP=${APACHE_INCLUDE_PHP-true}
 ```
 
@@ -45,7 +45,7 @@ server {
   listen       80;
   server_name  0.0.0.0;
   client_max_body_size 4G;
-  root /var/apps/example;
+  root /var/local/apps/example;
   index index.html;
 }
 ```
@@ -53,8 +53,8 @@ server {
 And, then
 
 ```
-mkdir -p /var/apps/example
-echo "HELLO WORLD" > /var/apps/example/index.html
+mkdir -p /var/local/apps/example
+echo "HELLO WORLD" > /var/local/apps/example/index.html
 ```
 
 Now, when you start the daemon,
