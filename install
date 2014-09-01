@@ -49,6 +49,7 @@ if [[ "$APACHE_INCLUDE_MYSQL" = true ]]; then
 fi
 
 if [[ "$APACHE_INCLUDE_RELOAD" = true ]]; then
+  echo "  -- enabling apache reload"
   cp ./submodules/apache/files/apache_touch $APACHE_LAUNCHER_DIR/files/apache_touch
   cp ./submodules/apache/files/touchandgo $APACHE_LAUNCHER_DIR/files/touchandgo
   cp ./submodules/apache/files/apache_reload $APACHE_LAUNCHER_DIR/files/apache_reload

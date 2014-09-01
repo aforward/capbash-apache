@@ -1,4 +1,4 @@
-# Install PHP
+# Support PHP
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qqy install libapache2-mod-php5 php5-gd php-pear php-apc php5-curl
 
 RUN sed -i "s/variables_order.*/variables_order = \"EGPCS\"/g" /etc/php5/apache2/php.ini

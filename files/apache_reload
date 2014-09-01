@@ -1,2 +1,2 @@
 #!/bin/bash
-apache2 reload
+/usr/sbin/apache2 -k graceful

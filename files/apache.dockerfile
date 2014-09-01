@@ -30,7 +30,7 @@ VOLUME ["/data", "/etc/apache2/sites-enabled", "/etc/apache2/sites-available", "
 # Define working directory.
 WORKDIR /etc/apache2
 
-CMD run-parts /etc/apache2/startup.d && exec apache2 -D FOREGROUND
+CMD run-parts /etc/apache2/startup.d && /usr/sbin/apache2 -D FOREGROUND
 
 # Expose ports.
 EXPOSE 80
