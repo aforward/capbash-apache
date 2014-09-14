@@ -45,7 +45,7 @@ server {
   listen       80;
   server_name  0.0.0.0;
   client_max_body_size 4G;
-  root /var/local/apps/example;
+  root /data/example;
   index index.html;
 }
 ```
