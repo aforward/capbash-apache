@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir -p ./nodes
-cp ./submodules/apache/files/apache_node ./nodes/apache
+cp ./bits/apache/files/apache_node ./nodes/apache
 chmod 755 ./nodes/apache
 
 capbash install docker

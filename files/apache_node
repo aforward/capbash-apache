@@ -1,8 +1,8 @@
 #!/bin/bash
-./submodules/docker/install
-./submodules/apache/install
+./bits/docker/install
+./bits/apache/install
 
-cp ./submodules/apache/files/helloworld_apache_conf /etc/apache2/sites-enabled/helloworld.conf
+cp ./bits/apache/files/helloworld_apache_conf /etc/apache2/sites-enabled/helloworld.conf
 chown www-data:www-data /etc/apache2/sites-enabled/helloworld.conf
 mkdir -p /var/local/apps/helloworld
 echo "HELLO WORLD" > /var/local/apps/helloworld/index.html
