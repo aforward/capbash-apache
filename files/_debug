@@ -1,0 +1,7 @@
+docker run -i -t
+  -p 9999:80
+  -p 9998:443
+  -v $APACHE_APPS_DIR:/data
+  -v $APACHE_SITES_ENABLED_DIR:/etc/apache2/sites-enabled
+  -v $APACHE_SITES_AVAILABLE_DIR:/etc/apache2/sites-available
+  -v $APACHE_LOG_DIR:/var/log/apache2
