@@ -1,11 +1,9 @@
 FROM ubuntu:14.04
 
-RUN apt-get -qq update
-RUN apt-get -qqy upgrade
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qqy install apache2 curl lynx-cur inotify-tools
-
-RUN mkdir -p /etc/apache2/startup.d
+RUN apt-get -qq update && \
+    apt-get -qqy upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qqy install apache2 curl lynx-cur inotify-tools && \
+    mkdir -p /etc/apache2/startup.d
 
 ADD files/do_nothing /etc/apache2/startup.d/do_nothing
 
